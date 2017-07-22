@@ -1,31 +1,36 @@
 import React, { Component } from 'react';
+import update from 'immutability-helper';
 import './App.css';
 
-  const deckValues = [
-            {v:1,f:"c1"},{v:2,f:"c2"},{v:3,f:"c3"},{v:4,f:"c4"},{v:5,f:"c5"},{v:6,f:"c6"},
-            {v:7,f:"c7"},{v:8,f:"c8"},{v:9,f:"c9"},{v:10,f:"c10"},{v:11,f:"c11"},{v:12,f:"c12"},{v:13,f:"c13"},
-            {v:1,f:"h1"},{v:2,f:"h2"},{v:3,f:"h3"},{v:4,f:"h4"},{v:5,f:"h5"},{v:6,f:"h6"},
-            {v:7,f:"h7"},{v:8,f:"h8"},{v:9,f:"h9"},{v:10,f:"h10"},{v:11,f:"h11"},{v:12,f:"h12"},{v:13,f:"h13"},
-            {v:1,f:"s1"},{v:2,f:"s2"},{v:3,f:"s3"},{v:4,f:"s4"},{v:5,f:"s5"},{v:6,f:"s6"},
-            {v:7,f:"s7"},{v:8,f:"s8"},{v:9,f:"s9"},{v:10,f:"s10"},{v:11,f:"s11"},{v:12,f:"s12"},{v:13,f:"s13"},
-            {v:1,f:"d1"},{v:2,f:"d2"},{v:3,f:"d3"},{v:4,f:"d4"},{v:5,f:"d5"},{v:6,f:"d6"},
-            {v:7,f:"d7"},{v:8,f:"d8"},{v:9,f:"d9"},{v:10,f:"d10"},{v:11,f:"d11"},{v:12,f:"d12"},{v:13,f:"d13"}
-  ];
 
 class App extends Component {
+  constructor() {
+    super();
+    const deck = shuffle(deckValues.slice());
+    this.state = {
+      deck: deck,
+      nextCard: deck.shift(),
+      foundations: Array(4).fill([]),
+      targets: Array(4).fill(null),
+      focusedFoundation: null,
+      nextCardFocused: true
+    };
+  }
 
   render() {
+      /*
     const foundations = [
-        [ {v:1, f:"ad"}, {v:3, f:"3c"}, {v:5, f:"5h"} ],
+        [ {v:1, f:"da"}, {v:3, f:"c3"}, {v:5, f:"h5"} ],
         [ ],
-        [ {v:11, f:"jh"}, {v:12, f:"qh"} ],
-        [ {v:13, f:"kc"} ],
+        [ {v:11, f:"hj"}, {v:12, f:"hq"} ],
+        [ {v:13, f:"ck"} ],
     ];
-    const targets = [ {v:1, f:"ac"}, {v:8, f:"8s"}, null, {v:4, f:"4h"} ];
+    const targets = [ {v:1, f:"ca"}, {v:8, f:"s8"}, null, {v:4, f:"h4"} ];
+    */
     const foundationComponents = [];
     const targetComponents = [];
     for (let i = 0; i < 4; i++) {
-      const foundationCards = foundations[i];
+      const foundationCards = this.state.foundations[i];
       foundationComponents.push(
           <Foundation
             i={i}
@@ -35,7 +40,7 @@ class App extends Component {
       targetComponents.push(
         <Target
           i={i}
-          topCard={targets[i]}
+          topCard={this.state.targets[i]}
         />
       );
     }
@@ -46,47 +51,78 @@ class App extends Component {
 
     return (
       <div style={{margin: "auto", maxWidth: "800px"}}>
-        <Card card="ac"/>
-        <Interface
-          deckSize={52}
-        />
+        <Card card={this.state.nextCard.f} focusable={true} autofocus={true}/>
+        <Status deckSize={this.state.deck.length}/>
         <div style={divStyle} className="foundations">
           {foundationComponents}
         </div>
+        <Interface onFoundationClick={(i) => this.onFoundationClick(i)} onTargetClick={this.onTargetClick}/>
         <div style={divStyle} className="targets">
           {targetComponents}
         </div>
       </div>
     );
   }
+
+  onFoundationFocus(i) {
+    this.setState({
+        nextCardFocused: false,
+        focusedFoundation: i
+    });
+  }
+
+  onNextCardFocus() {
+    this.setState({
+        nextCardFocused: true,
+        focusedFoundation: null
+    });
+  }
+
+  onFoundationClick(i) {
+    console.log(this);
+    if (!this.state.nextCardFocused) {
+      return;
+    }
+
+    const deck = this.state.deck.slice();
+    const nextCard = deck.shift();
+    const foundations = update(this.state.foundations, {[i]: {$push: [ this.state.nextCard ]}});
+    
+    this.setState({
+        deck: deck,
+        nextCard: nextCard,
+        foundations: foundations
+    });
+  }
+
+  onTargetClick(i) {
+  }
 }
 
-const Card = ({ card }) => {
+const Card = ({ card, focusable, autofocus }) => {
   const imagePath = "cards/" + card + ".png";
-  return <img src={imagePath}/>
+  if (focusable) {
+    return <img tabIndex="0" src={imagePath} onFocus={() => {console.log(card);}} ref={input => input && autofocus && input.focus()}/>
+  } else {
+    return <img src={imagePath}/>
+  }
 };
 
-const Interface = (props) => {
+const Interface = ({ onFoundationClick, onTargetClick }) => {
   return (
-    <div className="interface">
-      <Status deckSize={props.deckSize}/>
-
-      <br/>
-
+    <div style={{marginBottom: "16px"}}className="interface">
       <div className="foundation-buttons">
-        <button>Foundation 1</button>
-        <button>Foundation 2</button>
-        <button>Foundation 3</button>
-        <button>Foundation 4</button>
+        <button style={{width:"25%"}} onClick={() => { onFoundationClick(0) }}>Foundation 1</button>
+        <button style={{width:"25%"}} onClick={() => { onFoundationClick(1) }}>Foundation 2</button>
+        <button style={{width:"25%"}} onClick={() => { onFoundationClick(2) }}>Foundation 3</button>
+        <button style={{width:"25%"}} onClick={() => { onFoundationClick(3) }}>Foundation 4</button>
       </div>
 
-      <br/>
-
       <div className="target-buttons">
-        <button>Target 1</button>
-        <button>Target 2</button>
-        <button>Target 3</button>
-        <button>Target 4</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(1) }}>Target 1</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(2) }}>Target 2</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(3) }}>Target 3</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(4) }}>Target 4</button>
       </div>
     </div>
   );
@@ -101,10 +137,10 @@ const Foundation = ({ i, cards }) => {
   const listStyle = {
     listStyleType: "none",
     paddingLeft: "0",
-    paddingBottom: "150px"
+    paddingBottom: "160px"
   };
   const listElementStyle = {
-    maxHeight: "40px"
+    height: "40px"
   };
   const divStyle = {
     display: "inline-block",
@@ -113,7 +149,8 @@ const Foundation = ({ i, cards }) => {
   };
 
   const cardComponents = cards.map((card, cardNum) => {
-    return <li style={listElementStyle} key={cardNum}><Card card={card.f}/></li>;
+    const focusable = cardNum === cards.length - 1;
+    return <li style={listElementStyle} key={cardNum}><Card card={card.f} focusable={focusable}/></li>;
   });
 
   return (
@@ -130,5 +167,36 @@ const Target = ({ i, topCard }) => {
   };
   return topCard ? <div style={divStyle}><Card card={topCard.f}/></div> : <div style={divStyle}/>;
 };
+
+function shuffle(array) {
+    let counter = array.length;
+
+    // While there are elements in the array
+    while (counter > 0) {
+        // Pick a random index
+        let index = Math.floor(Math.random() * counter);
+
+        // Decrease counter by 1
+        counter--;
+
+        // And swap the last element with it
+        let temp = array[counter];
+        array[counter] = array[index];
+        array[index] = temp;
+    }
+
+    return array;
+}
+
+const deckValues = Object.freeze([
+        {v:1,f:"ca"},{v:2,f:"c2"},{v:3,f:"c3"},{v:4,f:"c4"},{v:5,f:"c5"},{v:6,f:"c6"},
+        {v:7,f:"c7"},{v:8,f:"c8"},{v:9,f:"c9"},{v:10,f:"c10"},{v:11,f:"cj"},{v:12,f:"cq"},{v:13,f:"ck"},
+        {v:1,f:"ha"},{v:2,f:"h2"},{v:3,f:"h3"},{v:4,f:"h4"},{v:5,f:"h5"},{v:6,f:"h6"},
+        {v:7,f:"h7"},{v:8,f:"h8"},{v:9,f:"h9"},{v:10,f:"h10"},{v:11,f:"hj"},{v:12,f:"hq"},{v:13,f:"hk"},
+        {v:1,f:"sa"},{v:2,f:"s2"},{v:3,f:"s3"},{v:4,f:"s4"},{v:5,f:"s5"},{v:6,f:"s6"},
+        {v:7,f:"s7"},{v:8,f:"s8"},{v:9,f:"s9"},{v:10,f:"s10"},{v:11,f:"sj"},{v:12,f:"sq"},{v:13,f:"sk"},
+        {v:1,f:"da"},{v:2,f:"d2"},{v:3,f:"d3"},{v:4,f:"d4"},{v:5,f:"d5"},{v:6,f:"d6"},
+        {v:7,f:"d7"},{v:8,f:"d8"},{v:9,f:"d9"},{v:10,f:"d10"},{v:11,f:"dj"},{v:12,f:"dq"},{v:13,f:"dk"}
+]);
 
 export default App;
