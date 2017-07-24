@@ -60,6 +60,7 @@ class App extends Component {
         <Interface
             onFoundationClick={(i) => this.onFoundationClick(i)}
             onTargetClick={(i) => this.onTargetClick(i)}
+            foundationsDisabled={!this.state.nextCardFocused}
             disabledStatuses={[0,1,2,3].map((i) => !this.canSendToTarget(i))}
         />
         <div style={divStyle} className="targets">
@@ -128,14 +129,14 @@ const Card = ({ card, onFocus, autofocus }) => {
   }
 };
 
-const Interface = ({ onFoundationClick, onTargetClick, disabledStatuses }) => {
+const Interface = ({ onFoundationClick, onTargetClick, foundationsDisabled, disabledStatuses }) => {
   return (
     <div style={{marginBottom: "16px"}}className="interface">
       <div className="foundation-buttons">
-        <button style={{width:"25%"}} onClick={() => { onFoundationClick(0) }}>Foundation 1</button>
-        <button style={{width:"25%"}} onClick={() => { onFoundationClick(1) }}>Foundation 2</button>
-        <button style={{width:"25%"}} onClick={() => { onFoundationClick(2) }}>Foundation 3</button>
-        <button style={{width:"25%"}} onClick={() => { onFoundationClick(3) }}>Foundation 4</button>
+        <button style={{width:"25%"}} onClick={() => { onFoundationClick(0) }} disabled={foundationsDisabled}>Foundation 1</button>
+        <button style={{width:"25%"}} onClick={() => { onFoundationClick(1) }} disabled={foundationsDisabled}>Foundation 2</button>
+        <button style={{width:"25%"}} onClick={() => { onFoundationClick(2) }} disabled={foundationsDisabled}>Foundation 3</button>
+        <button style={{width:"25%"}} onClick={() => { onFoundationClick(3) }} disabled={foundationsDisabled}>Foundation 4</button>
       </div>
 
       <div className="target-buttons">
