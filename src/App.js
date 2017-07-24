@@ -35,6 +35,7 @@ class App extends Component {
           <Foundation
             i={i}
             cards={foundationCards}
+            onFoundationFocus={(i) => this.onFoundationFocus(i)}
           />
       );
       targetComponents.push(
@@ -51,12 +52,16 @@ class App extends Component {
 
     return (
       <div style={{margin: "auto", maxWidth: "800px"}}>
-        <Card card={this.state.nextCard.f} focusable={true} autofocus={true}/>
+        <Card card={this.state.nextCard.f} onFocus={() => this.onNextCardFocus()} autofocus={true}/>
         <Status deckSize={this.state.deck.length}/>
         <div style={divStyle} className="foundations">
           {foundationComponents}
         </div>
-        <Interface onFoundationClick={(i) => this.onFoundationClick(i)} onTargetClick={this.onTargetClick}/>
+        <Interface
+            onFoundationClick={(i) => this.onFoundationClick(i)}
+            onTargetClick={(i) => this.onTargetClick(i)}
+            disabledStatuses={[0,1,2,3].map((i) => !this.canSendToTarget(i))}
+        />
         <div style={divStyle} className="targets">
           {targetComponents}
         </div>
@@ -79,7 +84,6 @@ class App extends Component {
   }
 
   onFoundationClick(i) {
-    console.log(this);
     if (!this.state.nextCardFocused) {
       return;
     }
@@ -97,18 +101,34 @@ class App extends Component {
 
   onTargetClick(i) {
   }
+
+  canSendToTarget(i) {
+    const card = this.focusedCard();
+    const targetValue = this.state.targets[i] ? this.state.targets[i].v : 0;
+
+    return card.v === (targetValue + (i + 1)) % 13;
+  }
+
+  focusedCard() {
+    if (this.state.nextCardFocused) {
+      return this.state.nextCard;
+    }
+
+    const foundation = this.state.foundations[this.state.focusedFoundation];
+    return foundation[foundation.length-1];
+  }
 }
 
-const Card = ({ card, focusable, autofocus }) => {
+const Card = ({ card, onFocus, autofocus }) => {
   const imagePath = "cards/" + card + ".png";
-  if (focusable) {
-    return <img tabIndex="0" src={imagePath} onFocus={() => {console.log(card);}} ref={input => input && autofocus && input.focus()}/>
+  if (onFocus) {
+    return <img tabIndex="0" src={imagePath} onFocus={onFocus} ref={input => input && autofocus && false && input.focus()}/>
   } else {
     return <img src={imagePath}/>
   }
 };
 
-const Interface = ({ onFoundationClick, onTargetClick }) => {
+const Interface = ({ onFoundationClick, onTargetClick, disabledStatuses }) => {
   return (
     <div style={{marginBottom: "16px"}}className="interface">
       <div className="foundation-buttons">
@@ -119,10 +139,10 @@ const Interface = ({ onFoundationClick, onTargetClick }) => {
       </div>
 
       <div className="target-buttons">
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(1) }}>Target 1</button>
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(2) }}>Target 2</button>
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(3) }}>Target 3</button>
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(4) }}>Target 4</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(1) }} disabled={disabledStatuses[0]}>Target 1</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(2) }} disabled={disabledStatuses[1]}>Target 2</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(3) }} disabled={disabledStatuses[2]}>Target 3</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(4) }} disabled={disabledStatuses[3]}>Target 4</button>
       </div>
     </div>
   );
@@ -133,7 +153,7 @@ const Status = ({ deckSize }) => {
   return <div className="status">{deckSizeMsg}</div>;
 }
 
-const Foundation = ({ i, cards }) => {
+const Foundation = ({ i, cards, onFoundationFocus }) => {
   const listStyle = {
     listStyleType: "none",
     paddingLeft: "0",
@@ -149,8 +169,11 @@ const Foundation = ({ i, cards }) => {
   };
 
   const cardComponents = cards.map((card, cardNum) => {
-    const focusable = cardNum === cards.length - 1;
-    return <li style={listElementStyle} key={cardNum}><Card card={card.f} focusable={focusable}/></li>;
+    if (cardNum === cards.length - 1) {
+      return <li style={listElementStyle} key={cardNum}><Card card={card.f} onFocus={() => onFoundationFocus(i)}/></li>;
+    } else {
+      return <li style={listElementStyle} key={cardNum}><Card card={card.f}/></li>;
+    }
   });
 
   return (
