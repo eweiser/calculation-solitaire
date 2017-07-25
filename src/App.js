@@ -101,6 +101,27 @@ class App extends Component {
   }
 
   onTargetClick(i) {
+    if (!this.canSendToTarget(i)) {
+      return;
+    }
+
+    const targets = update(this.state.targets, {[i]: {$set: this.focusedCard()}});
+    const stateChange = { targets: targets };
+    if (this.state.nextCardFocused) {
+      const deck = this.state.deck.slice();
+      const nextCard = deck.shift();
+
+      stateChange["deck"] = deck;
+      stateChange["nextCard"] = nextCard;
+    } else {
+      const foundationLength = this.state.foundations[this.state.focusedFoundation].length - 1
+      const foundations = update(this.state.foundations, {[this.state.focusedFoundation]: {$splice: [[foundationLength]]}});
+      stateChange["foundations"] = foundations;
+    }
+
+    stateChange["targets"] = targets;
+
+    this.setState(stateChange);
   }
 
   canSendToTarget(i) {
@@ -140,10 +161,10 @@ const Interface = ({ onFoundationClick, onTargetClick, foundationsDisabled, disa
       </div>
 
       <div className="target-buttons">
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(1) }} disabled={disabledStatuses[0]}>Target 1</button>
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(2) }} disabled={disabledStatuses[1]}>Target 2</button>
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(3) }} disabled={disabledStatuses[2]}>Target 3</button>
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(4) }} disabled={disabledStatuses[3]}>Target 4</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(0) }} disabled={disabledStatuses[0]}>Target 1</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(1) }} disabled={disabledStatuses[1]}>Target 2</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(2) }} disabled={disabledStatuses[2]}>Target 3</button>
+        <button style={{width:"25%"}} onClick={() => { onTargetClick(3) }} disabled={disabledStatuses[3]}>Target 4</button>
       </div>
     </div>
   );
