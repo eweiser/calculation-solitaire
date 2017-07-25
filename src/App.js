@@ -6,7 +6,7 @@ import './App.css';
 class App extends Component {
   constructor() {
     super();
-    const deck = shuffle(deckValues.slice());
+    const deck = [{f:"ca",v:1}];//shuffle(deckValues.slice());
     this.state = {
       deck: deck,
       nextCard: deck.shift(),
@@ -18,15 +18,6 @@ class App extends Component {
   }
 
   render() {
-      /*
-    const foundations = [
-        [ {v:1, f:"da"}, {v:3, f:"c3"}, {v:5, f:"h5"} ],
-        [ ],
-        [ {v:11, f:"hj"}, {v:12, f:"hq"} ],
-        [ {v:13, f:"ck"} ],
-    ];
-    const targets = [ {v:1, f:"ca"}, {v:8, f:"s8"}, null, {v:4, f:"h4"} ];
-    */
     const foundationComponents = [];
     const targetComponents = [];
     for (let i = 0; i < 4; i++) {
@@ -52,7 +43,7 @@ class App extends Component {
 
     return (
       <div style={{margin: "auto", maxWidth: "800px"}}>
-        <Card card={this.state.nextCard.f} onFocus={() => this.onNextCardFocus()} autofocus={true}/>
+        <NextCard cardObj={this.state.nextCard} onFocus={() => this.onNextCardFocus()}/>
         <Status deckSize={this.state.deck.length}/>
         <div style={divStyle} className="foundations">
           {foundationComponents}
@@ -60,7 +51,7 @@ class App extends Component {
         <Interface
             onFoundationClick={(i) => this.onFoundationClick(i)}
             onTargetClick={(i) => this.onTargetClick(i)}
-            foundationsDisabled={!this.state.nextCardFocused}
+            foundationsDisabled={!(this.state.nextCardFocused && this.state.nextCard)}
             disabledStatuses={[0,1,2,3].map((i) => !this.canSendToTarget(i))}
         />
         <div style={divStyle} className="targets">
@@ -126,8 +117,11 @@ class App extends Component {
 
   canSendToTarget(i) {
     const card = this.focusedCard();
-    const targetValue = this.state.targets[i] ? this.state.targets[i].v : 0;
+    if (!card) {
+      return false;
+    }
 
+    const targetValue = this.state.targets[i] ? this.state.targets[i].v : 0;
     return card.v === (targetValue + (i + 1)) % 13;
   }
 
@@ -148,6 +142,16 @@ const Card = ({ card, onFocus, autofocus }) => {
   } else {
     return <img src={imagePath}/>
   }
+};
+
+const NextCard = ({cardObj, onFocus}) => {
+  if (!cardObj) {
+    return (
+      <div>GAME OVER</div>
+    );
+  }
+
+  return <Card card={cardObj.f} onFocus={onFocus} autofocus={true}/>;
 };
 
 const Interface = ({ onFoundationClick, onTargetClick, foundationsDisabled, disabledStatuses }) => {
