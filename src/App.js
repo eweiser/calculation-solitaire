@@ -6,7 +6,7 @@ import './App.css';
 class App extends Component {
   constructor() {
     super();
-    const deck = [{f:"ca",v:1}];//shuffle(deckValues.slice());
+    const deck = shuffle(deckValues.slice());
     this.state = {
       deck: deck,
       nextCard: deck.shift(),
@@ -44,7 +44,7 @@ class App extends Component {
     return (
       <div style={{margin: "auto", maxWidth: "800px"}}>
         <NextCard cardObj={this.state.nextCard} onFocus={() => this.onNextCardFocus()}/>
-        <Status deckSize={this.state.deck.length}/>
+        <Status deckSize={this.state.deck.length} victory={this.isWin()}/>
         <div style={divStyle} className="foundations">
           {foundationComponents}
         </div>
@@ -59,6 +59,17 @@ class App extends Component {
         </div>
       </div>
     );
+  }
+
+  isWin() {
+    for (let i = 0; i < this.state.targets.length; i++) {
+      const target = this.state.targets[i];
+      if (!target || target.v < 13) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   onFoundationFocus(i) {
@@ -122,7 +133,7 @@ class App extends Component {
     }
 
     const targetValue = this.state.targets[i] ? this.state.targets[i].v : 0;
-    return card.v === (targetValue + (i + 1)) % 13;
+    return (targetValue < 13) && (card.v % 13 === (targetValue + (i + 1)) % 13);
   }
 
   focusedCard() {
@@ -147,7 +158,7 @@ const Card = ({ card, onFocus, autofocus }) => {
 const NextCard = ({cardObj, onFocus}) => {
   if (!cardObj) {
     return (
-      <div>GAME OVER</div>
+      <div></div>
     );
   }
 
@@ -174,9 +185,16 @@ const Interface = ({ onFoundationClick, onTargetClick, foundationsDisabled, disa
   );
 }
 
-const Status = ({ deckSize }) => {
-  const deckSizeMsg = deckSize + " cards remaining";
-  return <div className="status">{deckSizeMsg}</div>;
+const Status = ({ deckSize, victory }) => {
+  let message;
+  if (victory) {
+    message = "VICTORY";
+  } else if (!deckSize) {
+    message = "GAME OVER";
+  } else {
+    message = deckSize + " cards remaining";
+  }
+  return <div className="status">{message}</div>;
 }
 
 const Foundation = ({ i, cards, onFoundationFocus }) => {
