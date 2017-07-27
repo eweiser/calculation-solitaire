@@ -24,9 +24,9 @@ class App extends Component {
       const foundationCards = this.state.foundations[i];
       foundationComponents.push(
           <Foundation
-            i={i}
             cards={foundationCards}
-            onFoundationFocus={(i) => this.onFoundationFocus(i)}
+            onFocus={() => this.onFoundationFocus(i)}
+            autofocus={this.state.focusedFoundation === i}
           />
       );
       targetComponents.push(
@@ -42,8 +42,8 @@ class App extends Component {
     };
 
     return (
-      <div style={{margin: "auto", maxWidth: "800px"}}>
-        <NextCard cardObj={this.state.nextCard} onFocus={() => this.onNextCardFocus()}/>
+      <div style={{margin: "auto", maxWidth: "800px"}} onKeyPress={(e) => this.onKeyPress(e)}>
+        <NextCard cardObj={this.state.nextCard} onFocus={() => this.onNextCardFocus()} autofocus={this.state.nextCardFocused}/>
         <Status deckSize={this.state.deck.length} victory={this.isWin()}/>
         <div style={divStyle} className="foundations">
           {foundationComponents}
@@ -59,6 +59,36 @@ class App extends Component {
         </div>
       </div>
     );
+  }
+
+  onKeyPress(e) {
+    let focusedFoundation;
+    switch (e.key) {
+      case '`':
+        this.setState({
+          focusedFoundation: null,
+          nextCardFocused: true
+        });
+        break;
+      case '1':
+        focusedFoundation = 0;
+        break;
+      case '2':
+        focusedFoundation = 1;
+        break;
+      case '3':
+        focusedFoundation = 2;
+        break;
+      case '4':
+        focusedFoundation = 3;
+        break;
+    }
+    if (undefined != focusedFoundation) {
+      this.setState({
+        focusedFoundation: focusedFoundation,
+        nextCardFocused: false
+      });
+    }
   }
 
   isWin() {
@@ -149,20 +179,20 @@ class App extends Component {
 const Card = ({ card, onFocus, autofocus }) => {
   const imagePath = "cards/" + card + ".png";
   if (onFocus) {
-    return <img tabIndex="0" src={imagePath} onFocus={onFocus} ref={input => input && autofocus && false && input.focus()}/>
+    return <img tabIndex="0" src={imagePath} onFocus={onFocus} ref={input => input && autofocus && input.focus()}/>
   } else {
     return <img src={imagePath}/>
   }
 };
 
-const NextCard = ({cardObj, onFocus}) => {
+const NextCard = ({ cardObj, onFocus, autofocus }) => {
   if (!cardObj) {
     return (
       <div></div>
     );
   }
 
-  return <Card card={cardObj.f} onFocus={onFocus} autofocus={true}/>;
+  return <Card card={cardObj.f} onFocus={onFocus} autofocus={autofocus}/>;
 };
 
 const Interface = ({ onFoundationClick, onTargetClick, foundationsDisabled, disabledStatuses }) => {
@@ -197,7 +227,7 @@ const Status = ({ deckSize, victory }) => {
   return <div className="status">{message}</div>;
 }
 
-const Foundation = ({ i, cards, onFoundationFocus }) => {
+const Foundation = ({ cards, onFocus, autofocus }) => {
   const listStyle = {
     listStyleType: "none",
     paddingLeft: "0",
@@ -214,7 +244,7 @@ const Foundation = ({ i, cards, onFoundationFocus }) => {
 
   const cardComponents = cards.map((card, cardNum) => {
     if (cardNum === cards.length - 1) {
-      return <li style={listElementStyle} key={cardNum}><Card card={card.f} onFocus={() => onFoundationFocus(i)}/></li>;
+      return <li style={listElementStyle} key={cardNum}><Card card={card.f} onFocus={onFocus} autofocus={autofocus}/></li>;
     } else {
       return <li style={listElementStyle} key={cardNum}><Card card={card.f}/></li>;
     }
