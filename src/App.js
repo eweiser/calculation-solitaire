@@ -63,31 +63,23 @@ class App extends Component {
 
   onKeyPress(e) {
     let focusedFoundation;
-    switch (e.key) {
-      case '`':
-        this.setState({
-          focusedFoundation: null,
-          nextCardFocused: true
-        });
-        break;
-      case '1':
-        focusedFoundation = 0;
-        break;
-      case '2':
-        focusedFoundation = 1;
-        break;
-      case '3':
-        focusedFoundation = 2;
-        break;
-      case '4':
-        focusedFoundation = 3;
-        break;
-    }
-    if (undefined != focusedFoundation) {
+    if (e.key === '`') {
       this.setState({
-        focusedFoundation: focusedFoundation,
+        focusedFoundation: null,
+        nextCardFocused: true
+      });
+    } else if (['1','2','3','4'].includes(e.key)) {
+      this.setState({
+        focusedFoundation: parseInt(e.key) - 1,
         nextCardFocused: false
       });
+    } else if (this.state.nextCardFocused && ['q', 'w', 'e', 'r'].includes(e.key)) {
+      this.onFoundationClick({ q: 0, w: 1, e: 2, r: 3 }[e.key]);
+    } else if (['a', 's', 'd', 'f'].includes(e.key)) {
+      const targetNum = { a: 0, s: 1, d: 2, f: 3}[e.key];
+      if (this.canSendToTarget(targetNum)) {
+        this.onTargetClick(targetNum);
+      }
     }
   }
 
