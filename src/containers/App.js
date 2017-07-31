@@ -147,6 +147,10 @@ class App extends Component {
       const foundationLength = this.state.foundations[this.state.focusedFoundation].length - 1
       const foundations = update(this.state.foundations, {[this.state.focusedFoundation]: {$splice: [[foundationLength]]}});
       stateChange["foundations"] = foundations;
+      if (foundationLength === 0) {
+        stateChange["nextCardFocused"] = true;
+        stateChange["focusedFoundation"] = null;
+      }
     }
 
     stateChange["targets"] = targets;
