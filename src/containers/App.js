@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import update from 'immutability-helper';
-import Card from '../components/Card';
 import NextCard from '../components/NextCard';
 import Interface from '../components/Interface';
 import Status from '../components/Status';
 import Foundation from '../components/Foundation';
 import Target from '../components/Target';
-import './App.css';
 
 
 class App extends Component {
@@ -68,7 +66,6 @@ class App extends Component {
   }
 
   onKeyPress(e) {
-    let focusedFoundation;
     if (e.key === '`') {
       this.setState({
         focusedFoundation: null,
@@ -76,7 +73,7 @@ class App extends Component {
       });
     } else if (['1','2','3','4'].includes(e.key)) {
       this.setState({
-        focusedFoundation: parseInt(e.key) - 1,
+        focusedFoundation: parseInt(e.key, 10) - 1,
         nextCardFocused: false
       });
     } else if (this.state.nextCardFocused && ['q', 'w', 'e', 'r'].includes(e.key)) {
