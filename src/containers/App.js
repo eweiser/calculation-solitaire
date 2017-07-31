@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
 import update from 'immutability-helper';
+import Card from '../components/Card';
+import NextCard from '../components/NextCard';
+import Interface from '../components/Interface';
+import Status from '../components/Status';
+import Foundation from '../components/Foundation';
+import Target from '../components/Target';
 import './App.css';
 
 
@@ -167,95 +173,6 @@ class App extends Component {
     return foundation[foundation.length-1];
   }
 }
-
-const Card = ({ card, onFocus, autofocus }) => {
-  const imagePath = "cards/" + card + ".png";
-  if (onFocus) {
-    return <img tabIndex="0" src={imagePath} onFocus={onFocus} ref={input => input && autofocus && input.focus()}/>
-  } else {
-    return <img src={imagePath}/>
-  }
-};
-
-const NextCard = ({ cardObj, onFocus, autofocus }) => {
-  if (!cardObj) {
-    return (
-      <div></div>
-    );
-  }
-
-  return <Card card={cardObj.f} onFocus={onFocus} autofocus={autofocus}/>;
-};
-
-const Interface = ({ onFoundationClick, onTargetClick, foundationsDisabled, disabledStatuses }) => {
-  return (
-    <div style={{marginBottom: "16px"}}className="interface">
-      <div className="foundation-buttons">
-        <button style={{width:"25%"}} onClick={() => { onFoundationClick(0) }} disabled={foundationsDisabled}>Foundation 1</button>
-        <button style={{width:"25%"}} onClick={() => { onFoundationClick(1) }} disabled={foundationsDisabled}>Foundation 2</button>
-        <button style={{width:"25%"}} onClick={() => { onFoundationClick(2) }} disabled={foundationsDisabled}>Foundation 3</button>
-        <button style={{width:"25%"}} onClick={() => { onFoundationClick(3) }} disabled={foundationsDisabled}>Foundation 4</button>
-      </div>
-
-      <div className="target-buttons">
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(0) }} disabled={disabledStatuses[0]}>Target 1</button>
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(1) }} disabled={disabledStatuses[1]}>Target 2</button>
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(2) }} disabled={disabledStatuses[2]}>Target 3</button>
-        <button style={{width:"25%"}} onClick={() => { onTargetClick(3) }} disabled={disabledStatuses[3]}>Target 4</button>
-      </div>
-    </div>
-  );
-}
-
-const Status = ({ deckSize, victory }) => {
-  let message;
-  if (victory) {
-    message = "VICTORY";
-  } else if (!deckSize) {
-    message = "GAME OVER";
-  } else {
-    message = deckSize + " cards remaining";
-  }
-  return <div className="status">{message}</div>;
-}
-
-const Foundation = ({ cards, onFocus, autofocus }) => {
-  const listStyle = {
-    listStyleType: "none",
-    paddingLeft: "0",
-    paddingBottom: "160px"
-  };
-  const listElementStyle = {
-    height: "40px"
-  };
-  const divStyle = {
-    display: "inline-block",
-    width: "25%",
-    verticalAlign: "top"
-  };
-
-  const cardComponents = cards.map((card, cardNum) => {
-    if (cardNum === cards.length - 1) {
-      return <li style={listElementStyle} key={cardNum}><Card card={card.f} onFocus={onFocus} autofocus={autofocus}/></li>;
-    } else {
-      return <li style={listElementStyle} key={cardNum}><Card card={card.f}/></li>;
-    }
-  });
-
-  return (
-    <div style={divStyle}>
-      <ul style={listStyle}>{cardComponents}</ul>
-    </div>
-  );
-}
-
-const Target = ({ i, topCard }) => {
-  const divStyle = {
-    display: "inline-block",
-    width: "25%",
-  };
-  return topCard ? <div style={divStyle}><Card card={topCard.f}/></div> : <div style={divStyle}/>;
-};
 
 function shuffle(array) {
     let counter = array.length;
