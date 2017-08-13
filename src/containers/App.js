@@ -47,7 +47,23 @@ class App extends Component {
 
     return (
       <div style={{margin: "auto", maxWidth: "800px"}} onKeyPress={(e) => this.onKeyPress(e)}>
-        <NextCard cardObj={this.state.nextCard} onFocus={() => this.onNextCardFocus()} autofocus={this.state.nextCardFocused}/>
+        <div>
+          <div style={{display: "inline-block"}}>
+            <NextCard cardObj={this.state.nextCard} onFocus={() => this.onNextCardFocus()} autofocus={this.state.nextCardFocused}/>
+          </div>
+          <div style={{paddingLeft: "10px", display: "inline-block"}}>
+            <h3>CALCULATION SOLITARE</h3>
+            <ul>
+            <li>Each foundation ignores suit and increments by either 1, 2, 3, or 4, all ending in K.</li>
+            <li>Tableaus can be stacked arbitrarily.</li>
+            <li>`,1,2,3,4 keys adjust focus between next card and the 4 tableaus.</li>
+            <li>Q,W,E,R send the next card to the corresponding tableau, if the next card is selected.</li>
+            <li>A,S,D,F sends the focused card to the corresponding foundation, if legal.</li>
+            <li>Use each foundation's progress tracker to see what card it requires next.</li>
+            </ul>
+            Good luck!
+          </div>
+        </div>
         <Status deckSize={this.state.deck.length} victory={this.isWin()}/>
         <div style={divStyle} className="foundations">
           {foundationComponents}
