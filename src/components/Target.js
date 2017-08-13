@@ -4,14 +4,20 @@ import Card from './Card';
 const Target = ({ i, topCard }) => {
   const divStyle = {
     display: "inline-block",
-    width: "25%",
+    width: "200px",
   };
   return (
     <div style={divStyle}>
-      { topCard &&
-        <Card card={topCard.f}/>
-      }
-      <TargetProgressTracker targetNum={i} topCard={topCard}/>
+      <div style={{width: "140px", margin:"0 auto"}}>
+        <div style={{height: "200px", border: "1px solid lightgray", borderRadius: "5px"}}>
+          { topCard &&
+            <Card card={topCard.f}/>
+          }
+        </div>
+        <div style={{width: "80%", margin:"0 auto"}}>
+          <TargetProgressTracker targetNum={i} topCard={topCard}/>
+        </div>
+      </div>
     </div>
   );
 };

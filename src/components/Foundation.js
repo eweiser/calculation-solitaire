@@ -5,15 +5,20 @@ const Foundation = ({ cards, onFocus, autofocus }) => {
   const listStyle = {
     listStyleType: "none",
     paddingLeft: "0",
+    minHeight: "40px",
     paddingBottom: "160px"
   };
+  if (cards.length === 0) {
+    listStyle["border"] = "1px solid lightgray";
+    listStyle["borderRadius"] = "5px";
+  }
   const listElementStyle = {
-    height: "40px"
+    height: "40px",
   };
   const divStyle = {
     display: "inline-block",
-    width: "25%",
-    verticalAlign: "top"
+    width: "200px",
+    verticalAlign: "top",
   };
 
   const cardComponents = cards.map((card, cardNum) => {
@@ -26,7 +31,11 @@ const Foundation = ({ cards, onFocus, autofocus }) => {
 
   return (
     <div style={divStyle}>
-      <ul style={listStyle}>{cardComponents}</ul>
+      <div style={{width: "138px", margin: "0 auto"}}>
+          <ul style={listStyle}>
+              {cardComponents}
+          </ul>
+      </div>
     </div>
   );
 }
