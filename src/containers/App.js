@@ -65,7 +65,7 @@ class App extends Component {
           </div>
         </div>
         <Status deckSize={this.state.deck.length} victory={this.isWin()}/>
-        <div style={divStyle} className="foundations">
+        <div style={divStyle}>
           {foundationComponents}
         </div>
         <Interface
@@ -74,7 +74,7 @@ class App extends Component {
             foundationsDisabled={!(this.state.nextCardFocused && this.state.nextCard)}
             disabledStatuses={[0,1,2,3].map((i) => !this.canSendToTarget(i))}
         />
-        <div style={divStyle} className="targets">
+        <div style={divStyle}>
           {targetComponents}
         </div>
       </div>
