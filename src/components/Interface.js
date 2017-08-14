@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Interface = ({ onFoundationClick, onTargetClick, foundationsDisabled, disabledStatuses }) => {
+const Interface = ({ onFoundationClick, onTargetClick, onUndoClick, onResetClick, foundationsDisabled, disabledStatuses, undoDisabled }) => {
   return (
     <div style={{marginBottom: "16px"}}className="interface">
       <div className="foundation-buttons">
@@ -15,6 +15,11 @@ const Interface = ({ onFoundationClick, onTargetClick, foundationsDisabled, disa
         <button style={{width:"25%"}} onClick={() => { onTargetClick(1) }} disabled={disabledStatuses[1]}>Foundation 2</button>
         <button style={{width:"25%"}} onClick={() => { onTargetClick(2) }} disabled={disabledStatuses[2]}>Foundation 3</button>
         <button style={{width:"25%"}} onClick={() => { onTargetClick(3) }} disabled={disabledStatuses[3]}>Foundation 4</button>
+      </div>
+
+      <div className="restart-reset-buttonss">
+        <button style={{width:"50%"}} onClick={onUndoClick} disabled={undoDisabled}>Undo</button>
+        <button style={{width:"50%"}} onClick={onResetClick}>Restart</button>
       </div>
     </div>
   );

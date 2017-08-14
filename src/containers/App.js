@@ -17,7 +17,8 @@ class App extends Component {
       foundations: Array(4).fill([]),
       targets: Array(4).fill(null),
       focusedFoundation: null,
-      nextCardFocused: true
+      nextCardFocused: true,
+      lastMove: null
     };
   }
 
@@ -71,8 +72,11 @@ class App extends Component {
         <Interface
             onFoundationClick={(i) => this.onFoundationClick(i)}
             onTargetClick={(i) => this.onTargetClick(i)}
+            onUndoClick={() => this.onUndoClick()}
+            onResetClick={() => this.onResetClick()}
             foundationsDisabled={!(this.state.nextCardFocused && this.state.nextCard)}
             disabledStatuses={[0,1,2,3].map((i) => !this.canSendToTarget(i))}
+            undoDisabled={this.state.lastMove === null}
         />
         <div style={divStyle}>
           {targetComponents}
@@ -139,7 +143,13 @@ class App extends Component {
     this.setState({
         deck: deck,
         nextCard: nextCard,
-        foundations: foundations
+        foundations: foundations,
+        lastMove: {
+          deck: this.state.deck,
+          nextCard: this.state.nextCard,
+          foundations: this.state.foundations,
+          targets: this.state.targets,
+        }
     });
   }
 
@@ -149,7 +159,15 @@ class App extends Component {
     }
 
     const targets = update(this.state.targets, {[i]: {$set: this.focusedCard()}});
-    const stateChange = { targets: targets };
+    const stateChange = {
+      targets: targets,
+      lastMove: {
+        deck: this.state.deck,
+        nextCard: this.state.nextCard,
+        foundations: this.state.foundations,
+        targets: this.state.targets,
+      }
+    };
     if (this.state.nextCardFocused) {
       const deck = this.state.deck.slice();
       const nextCard = deck.shift();
@@ -169,6 +187,40 @@ class App extends Component {
     stateChange["targets"] = targets;
 
     this.setState(stateChange);
+  }
+
+  onUndoClick() {
+    if (this.state.lastMove === null) {
+      return;
+    }
+
+    this.setState({
+      deck: this.state.lastMove.deck,
+      nextCard: this.state.lastMove.nextCard,
+      foundations: this.state.lastMove.foundations,
+      targets: this.state.lastMove.targets,
+      focusedFoundation: null,
+      nextCardFocused: true,
+      lastMove: null
+    });
+  }
+
+  onResetClick() {
+    const deck = shuffle(deckValues.slice());
+    this.setState({
+      deck: deck,
+      nextCard: deck.shift(),
+      foundations: Array(4).fill([]),
+      targets: Array(4).fill(null),
+      focusedFoundation: null,
+      nextCardFocused: true,
+      lastMove: {
+        deck: this.state.deck,
+        nextCard: this.state.nextCard,
+        foundations: this.state.foundations,
+        targets: this.state.targets,
+      }
+    });
   }
 
   canSendToTarget(i) {
